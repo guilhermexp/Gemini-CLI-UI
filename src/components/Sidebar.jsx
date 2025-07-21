@@ -410,21 +410,21 @@ function Sidebar({
   });
 
   return (
-    <div className="h-full flex flex-col bg-card md:select-none">
+    <div className="h-full flex flex-col bg-card md:select-none overflow-hidden">
       {/* Header */}
       <div className="md:p-4 md:border-b md:border-border">
         {/* Desktop Header */}
-        <div className="hidden md:flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-              <MessageSquare className="w-4 h-4 text-primary-foreground" />
+        <div className="hidden md:flex items-center justify-between overflow-hidden">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+              <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-foreground">Gemini CLI UI</h1>
-              <p className="text-sm text-muted-foreground">AI coding assistant interface</p>
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <h1 className="text-lg font-bold text-foreground truncate">Gemini CLI UI</h1>
+              <p className="text-sm text-muted-foreground truncate">AI coding assistant interface</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-shrink-0 ml-2">
             <Button
               variant="ghost"
               size="sm"
@@ -440,7 +440,7 @@ function Sidebar({
               disabled={isRefreshing}
               title="Refresh projects and sessions (Ctrl+R)"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''} group-hover:rotate-180 transition-transform duration-300`} />
+              <RefreshCw className={`w-4 h-4 md:w-5 md:h-5 ${isRefreshing ? 'animate-spin' : ''} group-hover:rotate-180 transition-transform duration-300`} />
             </Button>
             <Button
               variant="default"
@@ -449,7 +449,7 @@ function Sidebar({
               onClick={() => setShowNewProject(true)}
               title="Create new project (Ctrl+N)"
             >
-              <FolderPlus className="w-4 h-4" />
+              <FolderPlus className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
           </div>
         </div>
@@ -459,7 +459,7 @@ function Sidebar({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-primary-foreground" />
+                <MessageSquare className="w-5 h-5 text-primary-foreground" />
               </div>
               <div>
                 <h1 className="text-lg font-semibold text-foreground">Gemini CLI UI</h1>
@@ -479,13 +479,13 @@ function Sidebar({
                 }}
                 disabled={isRefreshing}
               >
-                <RefreshCw className={`w-4 h-4 text-foreground ${isRefreshing ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-5 h-5 text-foreground ${isRefreshing ? 'animate-spin' : ''}`} />
               </button>
               <button
                 className="w-8 h-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-all duration-150"
                 onClick={() => setShowNewProject(true)}
               >
-                <FolderPlus className="w-4 h-4" />
+                <FolderPlus className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -498,7 +498,7 @@ function Sidebar({
           {/* Desktop Form */}
           <div className="hidden md:block space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <FolderPlus className="w-4 h-4" />
+              <FolderPlus className="w-4 h-4 md:w-5 md:h-5" />
               Create New Project
             </div>
             <Input
@@ -538,8 +538,8 @@ function Sidebar({
             <div className="absolute bottom-0 left-0 right-0 bg-card rounded-t-lg border-t border-border p-4 space-y-4 animate-in slide-in-from-bottom duration-300">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-primary/10 rounded-md flex items-center justify-center">
-                    <FolderPlus className="w-3 h-3 text-primary" />
+                  <div className="w-8 h-8 bg-primary/10 rounded-md flex items-center justify-center">
+                    <FolderPlus className="w-4 h-4 text-primary" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">New Project</h2>
@@ -548,9 +548,9 @@ function Sidebar({
                 <button
                   onClick={cancelNewProject}
                   disabled={creatingProject}
-                  className="w-6 h-6 rounded-md bg-muted flex items-center justify-center active:scale-95 transition-transform"
+                  className="w-8 h-8 rounded-md bg-muted flex items-center justify-center active:scale-95 transition-transform"
                 >
-                  <X className="w-3 h-3" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
               
@@ -597,7 +597,7 @@ function Sidebar({
       {projects.length > 0 && !isLoading && (
         <div className="px-3 md:px-4 py-2 border-b border-border">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search projects..."
@@ -610,7 +610,7 @@ function Sidebar({
                 onClick={() => setSearchFilter('')}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-accent rounded"
               >
-                <X className="w-3 h-3 text-muted-foreground" />
+                <X className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground" />
               </button>
             )}
           </div>
@@ -633,7 +633,7 @@ function Sidebar({
           ) : projects.length === 0 ? (
             <div className="text-center py-12 md:py-8 px-4">
               <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4 md:mb-3">
-                <Folder className="w-6 h-6 text-muted-foreground" />
+                <Folder className="w-8 h-8 md:w-6 md:h-6 text-muted-foreground" />
               </div>
               <h3 className="text-base font-medium text-foreground mb-2 md:mb-1">No projects found</h3>
               <p className="text-sm text-muted-foreground">
@@ -643,7 +643,7 @@ function Sidebar({
           ) : filteredProjects.length === 0 ? (
             <div className="text-center py-12 md:py-8 px-4">
               <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4 md:mb-3">
-                <Search className="w-6 h-6 text-muted-foreground" />
+                <Search className="w-8 h-8 md:w-6 md:h-6 text-muted-foreground" />
               </div>
               <h3 className="text-base font-medium text-foreground mb-2 md:mb-1">No matching projects</h3>
               <p className="text-sm text-muted-foreground">
@@ -681,9 +681,9 @@ function Sidebar({
                               isExpanded ? "bg-primary/10" : "bg-muted"
                             )}>
                               {isExpanded ? (
-                                <FolderOpen className="w-4 h-4 text-primary" />
+                                <FolderOpen className="w-5 h-5 text-primary" />
                               ) : (
-                                <Folder className="w-4 h-4 text-muted-foreground" />
+                                <Folder className="w-5 h-5 text-muted-foreground" />
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
@@ -734,7 +734,7 @@ function Sidebar({
                                     saveProjectName(project.name);
                                   }}
                                 >
-                                  <Check className="w-4 h-4 text-white" />
+                                  <Check className="w-5 h-5 text-white" />
                                 </button>
                                 <button
                                   className="w-8 h-8 rounded-lg bg-gray-500 dark:bg-gray-600 flex items-center justify-center active:scale-90 transition-all duration-150 shadow-sm active:shadow-none"
@@ -743,7 +743,7 @@ function Sidebar({
                                     cancelEditing();
                                   }}
                                 >
-                                  <X className="w-4 h-4 text-white" />
+                                  <X className="w-5 h-5 text-white" />
                                 </button>
                               </>
                             ) : (
@@ -764,7 +764,7 @@ function Sidebar({
                                   title={isStarred ? "Remove from favorites" : "Add to favorites"}
                                 >
                                   <Star className={cn(
-                                    "w-4 h-4 transition-colors",
+                                    "w-5 h-5 transition-colors",
                                     isStarred 
                                       ? "text-yellow-600 dark:text-yellow-400 fill-current" 
                                       : "text-gray-600 dark:text-gray-400"
@@ -779,7 +779,7 @@ function Sidebar({
                                     }}
                                     onTouchEnd={handleTouchClick(() => deleteProject(project.name))}
                                   >
-                                    <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                    <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
                                   </button>
                                 )}
                                 <button
@@ -790,13 +790,13 @@ function Sidebar({
                                   }}
                                   onTouchEnd={handleTouchClick(() => startEditing(project))}
                                 >
-                                  <Edit3 className="w-4 h-4 text-primary" />
+                                  <Edit3 className="w-5 h-5 text-primary" />
                                 </button>
-                                <div className="w-6 h-6 rounded-md bg-muted/30 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-md bg-muted/30 flex items-center justify-center">
                                   {isExpanded ? (
-                                    <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
                                   ) : (
-                                    <ChevronRight className="w-3 h-3 text-muted-foreground" />
+                                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                   )}
                                 </div>
                               </>
@@ -830,9 +830,9 @@ function Sidebar({
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         {isExpanded ? (
-                          <FolderOpen className="w-4 h-4 text-primary flex-shrink-0" />
+                          <FolderOpen className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
                         ) : (
-                          <Folder className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <Folder className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground flex-shrink-0" />
                         )}
                         <div className="min-w-0 flex-1 text-left">
                           {editingProject === project.name ? (
@@ -885,7 +885,7 @@ function Sidebar({
                                 saveProjectName(project.name);
                               }}
                             >
-                              <Check className="w-3 h-3" />
+                              <Check className="w-3 h-3 md:w-4 md:h-4" />
                             </div>
                             <div
                               className="w-6 h-6 text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-center rounded cursor-pointer transition-colors"
@@ -894,7 +894,7 @@ function Sidebar({
                                 cancelEditing();
                               }}
                             >
-                              <X className="w-3 h-3" />
+                              <X className="w-4 h-4" />
                             </div>
                           </>
                         ) : (
@@ -914,7 +914,7 @@ function Sidebar({
                               title={isStarred ? "Remove from favorites" : "Add to favorites"}
                             >
                               <Star className={cn(
-                                "w-3 h-3 transition-colors",
+                                "w-3 h-3 md:w-4 md:h-4 transition-colors",
                                 isStarred 
                                   ? "text-yellow-600 dark:text-yellow-400 fill-current" 
                                   : "text-muted-foreground"
@@ -928,7 +928,7 @@ function Sidebar({
                               }}
                               title="Rename project (F2)"
                             >
-                              <Edit3 className="w-3 h-3" />
+                              <Edit3 className="w-3 h-3 md:w-4 md:h-4" />
                             </div>
                             {getAllSessions(project).length === 0 && (
                               <div
@@ -939,13 +939,13 @@ function Sidebar({
                                 }}
                                 title="Delete empty project (Delete)"
                               >
-                                <Trash2 className="w-3 h-3 text-red-600 dark:text-red-400" />
+                                <Trash2 className="w-3 h-3 md:w-4 md:h-4 text-red-600 dark:text-red-400" />
                               </div>
                             )}
                             {isExpanded ? (
-                              <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                              <ChevronDown className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                             ) : (
-                              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                              <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                             )}
                           </>
                         )}
@@ -1007,11 +1007,11 @@ function Sidebar({
                               >
                                 <div className="flex items-center gap-2">
                                   <div className={cn(
-                                    "w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0",
+                                    "w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0",
                                     selectedSession?.id === session.id ? "bg-primary/10" : "bg-muted/50"
                                   )}>
                                     <MessageSquare className={cn(
-                                      "w-3 h-3",
+                                      "w-4 h-4",
                                       selectedSession?.id === session.id ? "text-primary" : "text-muted-foreground"
                                     )} />
                                   </div>
@@ -1020,7 +1020,7 @@ function Sidebar({
                                       {session.summary || 'New Session'}
                                     </div>
                                     <div className="flex items-center gap-1 mt-0.5">
-                                      <Clock className="w-2.5 h-2.5 text-muted-foreground" />
+                                      <Clock className="w-3 h-3 text-muted-foreground" />
                                       <span className="text-xs text-muted-foreground">
                                         {formatTimeAgo(session.lastActivity, currentTime)}
                                       </span>
@@ -1033,14 +1033,14 @@ function Sidebar({
                                   </div>
                                   {/* Mobile delete button */}
                                   <button
-                                    className="w-5 h-5 rounded-md bg-red-50 dark:bg-red-900/20 flex items-center justify-center active:scale-95 transition-transform opacity-70 ml-1"
+                                    className="w-8 h-8 rounded-md bg-red-50 dark:bg-red-900/20 flex items-center justify-center active:scale-95 transition-transform opacity-70 ml-1"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       deleteSession(project.name, session.id);
                                     }}
                                     onTouchEnd={handleTouchClick(() => deleteSession(project.name, session.id))}
                                   >
-                                    <Trash2 className="w-2.5 h-2.5 text-red-600 dark:text-red-400" />
+                                    <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                                   </button>
                                 </div>
                               </div>
@@ -1058,13 +1058,13 @@ function Sidebar({
                                 onTouchEnd={handleTouchClick(() => onSessionSelect(session))}
                               >
                                 <div className="flex items-start gap-2 min-w-0 w-full">
-                                  <MessageSquare className="w-3 h-3 text-muted-foreground mt-0.5 flex-shrink-0" />
+                                  <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                                   <div className="min-w-0 flex-1">
                                     <div className="text-xs font-medium truncate text-foreground">
                                       {session.summary || 'New Session'}
                                     </div>
                                     <div className="flex items-center gap-1 mt-0.5">
-                                      <Clock className="w-2.5 h-2.5 text-muted-foreground" />
+                                      <Clock className="w-3 h-3 text-muted-foreground" />
                                       <span className="text-xs text-muted-foreground">
                                         {formatTimeAgo(session.lastActivity, currentTime)}
                                       </span>
@@ -1135,7 +1135,7 @@ function Sidebar({
                                       {generatingSummary[`${project.name}-${session.id}`] ? (
                                         <div className="w-3 h-3 animate-spin rounded-full border border-blue-600 dark:border-blue-400 border-t-transparent" />
                                       ) : (
-                                        <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                                        <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-blue-600 dark:text-blue-400" />
                                       )}
                                     </button> */}
                                     {/* Edit button */}
@@ -1148,7 +1148,7 @@ function Sidebar({
                                       }}
                                       title="Manually edit session name"
                                     >
-                                      <Edit2 className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                                      <Edit2 className="w-3 h-3 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
                                     </button>
                                     {/* Delete button */}
                                     <button
@@ -1159,7 +1159,7 @@ function Sidebar({
                                       }}
                                       title="Delete this session permanently"
                                     >
-                                      <Trash2 className="w-3 h-3 text-red-600 dark:text-red-400" />
+                                      <Trash2 className="w-3 h-3 md:w-4 md:h-4 text-red-600 dark:text-red-400" />
                                     </button>
                                   </>
                                 )}
@@ -1186,7 +1186,7 @@ function Sidebar({
                             </>
                           ) : (
                             <>
-                              <ChevronDown className="w-3 h-3" />
+                              <ChevronDown className="w-3 h-3 md:w-4 md:h-4" />
                               Show more sessions
                             </>
                           )}
@@ -1202,7 +1202,7 @@ function Sidebar({
                             onNewSession(project);
                           }}
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3 h-3 md:w-4 md:h-4" />
                           New Session
                         </button>
                       </div>
@@ -1213,7 +1213,7 @@ function Sidebar({
                         className="hidden md:flex w-full justify-start gap-2 mt-1 h-8 text-xs font-medium bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
                         onClick={() => onNewSession(project)}
                       >
-                        <Plus className="w-3 h-3" />
+                        <Plus className="w-3 h-3 md:w-4 md:h-4" />
                         New Session
                       </Button>
                     </div>
@@ -1278,7 +1278,7 @@ function Sidebar({
             onClick={onShowSettings}
           >
             <div className="w-10 h-10 rounded-2xl bg-background/80 flex items-center justify-center">
-              <Settings className="w-5 h-5 text-muted-foreground" />
+              <Settings className="w-6 h-6 text-muted-foreground" />
             </div>
             <span className="text-lg font-medium text-foreground">Settings</span>
           </button>
@@ -1290,7 +1290,7 @@ function Sidebar({
           className="hidden md:flex w-full justify-start gap-2 p-2 h-auto font-normal text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-200"
           onClick={onShowSettings}
         >
-          <Settings className="w-3 h-3" />
+          <Settings className="w-4 h-4 md:w-5 md:h-5" />
           <span className="text-xs">Tools Settings</span>
         </Button>
       </div>

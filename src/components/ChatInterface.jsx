@@ -110,7 +110,7 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
         <div className="w-full">
           {!isGrouped && (
             <div className="flex items-center space-x-3 mb-2">
-              {message.type === 'error' ? (
+              {(message.type === 'error' || message.type === 'quota-error') ? (
                 <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white text-sm flex-shrink-0">
                   !
                 </div>
@@ -120,7 +120,7 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                 </div>
               )}
               <div className="text-sm font-medium text-gray-900 dark:text-white">
-                {message.type === 'error' ? 'Error' : 'Gemini'}
+                {message.type === 'error' ? 'Error' : message.type === 'quota-error' ? 'Quota Limit' : 'Gemini'}
               </div>
             </div>
           )}
@@ -924,8 +924,12 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                 📋 Read todo list
               </div>
             ) : (
-              <div className={`text-sm ${message.type === 'error' ? 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800 relative' : 'text-gray-700 dark:text-gray-300'}`}>
-                {message.type === 'error' && (
+              <div className={`text-sm ${(message.type === 'error' || message.type === 'quota-error') ? 
+                (message.type === 'quota-error' ? 
+                  'text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg border border-orange-200 dark:border-orange-800 relative' : 
+                  'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800 relative'
+                ) : 'text-gray-700 dark:text-gray-300'}`}>
+                {(message.type === 'error' || message.type === 'quota-error') && (
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(message.content)
@@ -939,20 +943,50 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                   </button>
                 )}
                 {message.type === 'assistant' ? (
-                  <div className={`prose prose-sm max-w-none dark:prose-invert prose-gray [&_code]:!bg-transparent [&_code]:!p-0 ${message.type === 'error' ? 'select-text cursor-text' : ''}`} style={{ contain: 'layout' }}>
+                  <div className={`prose prose-sm max-w-none dark:prose-invert prose-gray [&_code]:!bg-transparent [&_code]:!p-0 ${(message.type === 'error' || message.type === 'quota-error') ? 'select-text cursor-text' : ''}`} style={{ contain: 'layout' }}>
                     <ReactMarkdown
+                      unwrapDisallowed={true}
                       components={{
+                        p: ({children}) => {
+                          // Convert children to array to check contents
+                          const childArray = React.Children.toArray(children);
+                          
+                          // Check if this paragraph contains a code block
+                          const hasCodeBlock = childArray.some(child => 
+                            React.isValidElement(child) && 
+                            (child.type === 'pre' || 
+                             (child.props && child.props.className && child.props.className.includes('language-')))
+                          );
+                          
+                          // If it contains a code block, don't wrap in p
+                          if (hasCodeBlock) {
+                            return <div className="my-2">{children}</div>;
+                          }
+                          
+                          return <p className="my-2">{children}</p>;
+                        },
+                        pre: ({children, ...props}) => (
+                          <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg overflow-hidden my-2" {...props}>
+                            {children}
+                          </pre>
+                        ),
                         code: ({node, inline, className, children, ...props}) => {
-                          return inline ? (
-                            <strong className="text-blue-600 dark:text-blue-400 font-bold not-prose" {...props}>
-                              {children}
-                            </strong>
-                          ) : (
-                            <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg overflow-hidden my-2">
-                              <code className="text-gray-800 dark:text-gray-200 text-sm font-mono block whitespace-pre-wrap break-words" {...props}>
+                          const match = /language-(\w+)/.exec(className || '');
+                          
+                          // If it's inline code or doesn't have a language class, render as inline
+                          if (inline || (!match && node?.parent?.tagName !== 'pre')) {
+                            return (
+                              <strong className="text-blue-600 dark:text-blue-400 font-bold not-prose" {...props}>
                                 {children}
-                              </code>
-                            </div>
+                              </strong>
+                            );
+                          }
+                          
+                          // For code blocks, just render the code element (pre will be handled by pre component)
+                          return (
+                            <code className="text-gray-800 dark:text-gray-200 text-sm font-mono block whitespace-pre-wrap break-words" {...props}>
+                              {children}
+                            </code>
                           );
                         },
                         blockquote: ({children}) => (
@@ -976,7 +1010,7 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                     </ReactMarkdown>
                   </div>
                 ) : (
-                  <div className={`whitespace-pre-wrap ${message.type === 'error' ? 'select-all cursor-text pr-16' : ''}`}>
+                  <div className={`whitespace-pre-wrap ${(message.type === 'error' || message.type === 'quota-error') ? 'select-all cursor-text pr-16' : ''}`}>
                     {message.content}
                   </div>
                 )}
@@ -1426,7 +1460,7 @@ function ChatInterface({ selectedProject, selectedSession, ws, sendMessage, mess
         setChatMessages(prev => [...prev, {
           id: `system-${Date.now()}`,
           type: 'system',
-          content: '⚙️ 設定が更新されました。',
+          content: '⚙️ Settings have been updated.',
           timestamp: new Date().toISOString()
         }]);
       }
@@ -1600,6 +1634,27 @@ function ChatInterface({ selectedProject, selectedSession, ws, sendMessage, mess
             type: 'error',
             content: `Error: ${latestMessage.error}`,
             timestamp: new Date()
+          }]);
+          setIsLoading(false);
+          setCanAbortSession(false);
+          setGeminiStatus(null);
+          break;
+
+        case 'quota-exceeded':
+          // Handle quota exceeded error with detailed information
+          const quotaMessage = latestMessage.quotaStatus ? 
+            `Quota exceeded for ${latestMessage.model}. ${latestMessage.error}.\n\n` +
+            `Daily usage: ${latestMessage.quotaStatus.models[latestMessage.model]?.daily.used || 0}/${latestMessage.quotaStatus.models[latestMessage.model]?.daily.limit || 0} requests\n` +
+            `Rate limit: ${latestMessage.quotaStatus.models[latestMessage.model]?.minute.used || 0}/${latestMessage.quotaStatus.models[latestMessage.model]?.minute.limit || 0} requests/min\n\n` +
+            `Quota resets in: ${latestMessage.timeUntilReset ? `${latestMessage.timeUntilReset.hours}h ${latestMessage.timeUntilReset.minutes}m` : 'Unknown'}\n\n` +
+            `💡 Consider switching to Gemini 2.5 Flash (1000 requests/day) if using Pro (25 requests/day).`
+            : `Quota exceeded: ${latestMessage.error}`;
+          
+          setChatMessages(prev => [...prev, {
+            type: 'quota-error',
+            content: quotaMessage,
+            timestamp: new Date(),
+            quotaInfo: latestMessage.quotaStatus
           }]);
           setIsLoading(false);
           setCanAbortSession(false);

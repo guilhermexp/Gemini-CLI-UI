@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
 import sessionManager from './sessionManager.js';
+import quotaManager from './quotaManager.js';
 
 let activeGeminiProcesses = new Map(); // Track active processes by session ID
 
@@ -21,6 +22,25 @@ async function spawnGemini(command, options = {}, ws) {
       disallowedTools: [],
       skipPermissions: false
     };
+    
+    // Get model from options or default
+    const modelToUse = options.model || 'gemini-2.5-flash';
+    
+    // Check quota before making request
+    const quotaCheck = await quotaManager.canMakeRequest(modelToUse);
+    if (!quotaCheck.canMake) {
+      const quotaStatus = await quotaManager.getQuotaStatus();
+      const timeUntilReset = quotaManager.getTimeUntilReset();
+      
+      ws.send(JSON.stringify({
+        type: 'quota-exceeded',
+        error: quotaCheck.reason,
+        quotaStatus,
+        timeUntilReset,
+        model: modelToUse
+      }));
+      return Promise.reject(new Error(`Quota exceeded: ${quotaCheck.reason}`));
+    }
     
     // Use tools settings
     
@@ -82,7 +102,7 @@ async function spawnGemini(command, options = {}, ws) {
         // Include the full image paths in the prompt for Gemini to reference
         // Gemini CLI can read images from file paths in the prompt
         if (tempImagePaths.length > 0 && command && command.trim()) {
-          const imageNote = `\n\n[画像を添付しました: ${tempImagePaths.length}枚の画像があります。以下のパスに保存されています:]\n${tempImagePaths.map((p, i) => `${i + 1}. ${p}`).join('\n')}`;
+          const imageNote = `\n\n[Images attached: ${tempImagePaths.length} image(s) saved at the following paths:]\n${tempImagePaths.map((p, i) => `${i + 1}. ${p}`).join('\n')}`;
           const modifiedCommand = command + imageNote;
           
           // Update the command in args
@@ -178,7 +198,6 @@ async function spawnGemini(command, options = {}, ws) {
     
     // Add model for all sessions (both new and resumed)
     // Debug - Model from options and resume session
-    const modelToUse = options.model || 'gemini-2.5-flash';
     // Debug - Using model
     args.push('--model', modelToUse);
     
@@ -221,7 +240,7 @@ async function spawnGemini(command, options = {}, ws) {
     
     // Add timeout handler
     let hasReceivedOutput = false;
-    const timeoutMs = 30000; // 30 seconds
+    const timeoutMs = 300000; // 5 minutes (increased from 30 seconds)
     const timeout = setTimeout(() => {
       if (!hasReceivedOutput) {
         // console.error('⏰ Gemini CLI timeout - no output received after', timeoutMs, 'ms');
@@ -237,6 +256,9 @@ async function spawnGemini(command, options = {}, ws) {
     if (command && capturedSessionId) {
       sessionManager.addMessage(capturedSessionId, 'user', command);
     }
+    
+    // Record the request in quota manager
+    await quotaManager.recordRequest(modelToUse);
     
     // Handle stdout (Gemini outputs plain text)
     let outputBuffer = '';
@@ -431,7 +453,7 @@ function abortGeminiSession(sessionId) {
             // console.error('Error force killing process:', e);
           }
         }
-      }, 2000); // Wait 2 seconds before force kill
+      }, 10000); // Wait 10 seconds before force kill (increased from 2 seconds)
       
       activeGeminiProcesses.delete(processKey);
       return true;

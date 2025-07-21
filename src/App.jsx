@@ -510,7 +510,7 @@ function AppContent() {
     <div className="fixed inset-0 flex bg-background">
       {/* Fixed Desktop Sidebar */}
       {!isMobile && (
-        <div className="w-80 flex-shrink-0 border-r border-border bg-card">
+        <div className="w-80 flex-shrink-0 border-r border-border bg-card overflow-hidden">
           <div className="h-full overflow-hidden">
             <Sidebar
               projects={projects}
@@ -654,7 +654,7 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <ProtectedRoute>
-            <Router>
+            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <Routes>
                 <Route path="/" element={<AppContent />} />
                 <Route path="/session/:sessionId" element={<AppContent />} />

@@ -39,6 +39,7 @@ import mime from 'mime-types';
 import { getProjects, getSessions, getSessionMessages, renameProject, deleteSession, deleteProject, addProjectManually, extractProjectDirectory, clearProjectDirectoryCache } from './projects.js';
 import { spawnGemini, abortGeminiSession } from './gemini-cli.js';
 import sessionManager from './sessionManager.js';
+import quotaManager from './quotaManager.js';
 import gitRoutes from './routes/git.js';
 import authRoutes from './routes/auth.js';
 import mcpRoutes from './routes/mcp.js';
@@ -198,6 +199,17 @@ app.get('/api/projects', authenticateToken, async (req, res) => {
     res.json(projects);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Get quota status
+app.get('/api/quota/status', authenticateToken, async (req, res) => {
+  try {
+    const quotaStatus = await quotaManager.getQuotaStatus();
+    res.json(quotaStatus);
+  } catch (error) {
+    console.error('Error fetching quota status:', error);
+    res.status(500).json({ error: 'Failed to fetch quota status' });
   }
 });
 
